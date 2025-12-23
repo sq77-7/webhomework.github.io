@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>个人简历</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+
+        :root {
+            --dark-green: #085142; /* 墨绿色主色调 */
+            --light-green: #0d6c59; /* 浅墨绿色辅助色 */
+            --white: #ffffff; /* 白色背景 */
+            --gray: #f5f5f5; /* 浅灰色分隔色 */
+            --text-gray: #101010; /* 文字颜色 */
+        }
+
+        body {
+            background-color: var(--white);
+            color: var(--text-gray);
+            scroll-behavior: smooth; /* 平滑滚动 */
+        }
+
+        /* 优化：首页欢迎界面（展示姓名+照片，增强动画） */
+        .welcome-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+            padding: 0 20px; /* 移动端左右内边距，防止内容溢出 */
+        }
+
+        .welcome-avatar {
+            width: clamp(100px, 25vw, 150px); /* 自适应尺寸：最小100px，最大150px，随屏幕宽度变化 */
+            height: clamp(100px, 25vw, 150px);
+            border-radius: 50%;
+            object-fit: cover;
+            border: 6px solid var(--white);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            margin-bottom: 1.5rem;
+            animation: avatarFloat 3s ease-in-out infinite alternate, fadeIn 1.5s ease;
+        }
+
+        .welcome-name {
+            color: var(--white);
+            font-size: clamp(1.8rem, 8vw, 3.5rem); /* 自适应字体：移动端1.8rem，电脑端3.5rem */
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 3px solid var(--white);
+            animation: typing 2s steps(10) forwards, blinkCursor 0.75s step-end infinite;
+            text-align: center; /* 移动端文字居中 */
+        }
+
+        .welcome-desc {
+            color: var(--white);
+            font-size: clamp(0.9rem, 3vw, 1.2rem); /* 自适应字体 */
+            letter-spacing: 2px;
+            animation: fadeUp 2s ease;
+            text-align: center; /* 移动端文字居中 */
+        }
+
+        /* 优化：导航栏（增强活泼感，新增悬浮动效+移动端适配） */
+        nav {
+            position: sticky;
+            top: 0;
+            background-color: var(--white);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            padding: 1rem 5%;
+            transition: transform 0.3s ease;
+        }
+
+        nav:hover {
+            transform: translateY(-2px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--dark-green);
+            font-size: clamp(1.2rem, 4vw, 1.5rem); /* 自适应字体 */
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        /* 移动端导航菜单按钮 */
+        .menu-toggle {
+            display: none; /* 电脑端隐藏 */
+            font-size: 1.5rem;
+            color: var(--dark-green);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: clamp(1rem, 3vw, 2rem); /* 自适应间距 */
+        }
+
+        .nav-links li {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links li:hover {
+            transform: translateY(-3px) rotate(1deg);
+        }
+
+        .nav-links li a {
+            text-decoration: none;
+            color: var(--text-gray);
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s ease;
+            font-size: clamp(0.9rem, 2.5vw, 1rem); /* 自适应字体 */
+        }
+
+        .nav-links li a:hover {
+            color: var(--dark-green);
+        }
+
+        .nav-links li a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--dark-green);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links li a:hover::after {
+            width: 100%;
+        }
+
+        /* 主内容容器 */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 3%; /* 减小移动端左右内边距，提升内容占比 */
+            width: 100%; /* 确保容器充满屏幕宽度 */
+        }
+
+        /* 优化：通用板块样式（增强动态感+自适应） */
+        .section {
+            margin: clamp(2rem, 5vw, 4rem) 0; /* 自适应上下间距 */
+            padding: clamp(1rem, 3vw, 2rem); /* 自适应内边距 */
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(10, 75, 62, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.8s ease, opacity 0.8s ease, box-shadow 0.3s ease;
+            width: 100%; /* 确保板块充满容器宽度 */
+        }
+
+        .section.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .section:hover {
+            box-shadow: 0 8px 25px rgba(10, 75, 62, 0.15);
+        }
+
+        .section-title {
+            color: var(--dark-green);
+            font-size: clamp(1.4rem, 5vw, 1.8rem); /* 自适应字体 */
+            margin-bottom: clamp(1.5rem, 4vw, 2rem); /* 自适应下间距 */
+            position: relative;
+            padding-bottom: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover .section-title {
+            transform: translateX(5px);
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--light-green);
+            transition: width 0.5s ease;
+        }
+
+        .section:hover .section-title::after {
+            width: 100px;
+        }
+
+        /* 优化：个人信息板块视频样式（完全自适应） */
+        .info-video {
+            width: 100%; /* 视频容器充满父元素宽度 */
+            max-width: 300px; /* 电脑端最大宽度限制 */
+            height: auto; /* 高度自适应，不再固定 */
+            margin: 1rem auto; /* 水平居中 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .personal-video {
+            width: 100%; /* 视频充满容器宽度 */
+            height: auto; /* 高度按比例自适应，防止拉伸 */
+            min-height: 150px; /* 移动端最小高度保障 */
+            max-height: 180px; /* 电脑端最大高度限制 */
+            border-radius: 10px;
+            border: 3px solid var(--light-green);
+            box-shadow: 0 4px 15px rgba(10, 75, 62, 0.2);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            object-fit: cover;
+        }
+
+        .video-desc {
+            text-align: center;
+            color: var(--dark-green);
+            font-size: clamp(0.8rem, 2vw, 0.9rem); /* 自适应字体 */
+            margin-top: 0.8rem;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        /* 个人信息板块 */
+        .personal-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(1.5rem, 4vw, 2rem); /* 自适应间距 */
+            align-items: center;
+            justify-content: center; /* 移动端内容居中 */
+        }
+
+        .info-avatar img {
+            width: clamp(150px, 30vw, 200px); /* 自适应尺寸 */
+            height: clamp(150px, 30vw, 200px);
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--light-green);
+            box-shadow: 0 0 20px rgba(16, 125, 104, 0.2);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .info-avatar img:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .info-content {
+            flex: 1;
+            min-width: 280px; /* 移动端最小宽度，防止内容挤压 */
+            width: 100%; /* 确保内容充满父元素 */
+            text-align: center; /* 移动端文字居中 */
+        }
+
+        .info-content h2 {
+            color: var(--dark-green);
+            font-size: clamp(1.5rem, 5vw, 2rem); /* 自适应字体 */
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .info-content:hover h2 {
+            color: var(--light-green);
+        }
+
+        .info-content .info-item {
+            margin: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            justify-content: center; /* 移动端信息项居中 */
+        }
+
+        .info-content .info-item:hover {
+            transform: translateX(5px);
+            opacity: 0.9;
+        }
+
+        .info-content .info-item i {
+            color: var(--light-green);
+            font-size: clamp(1rem, 3vw, 1.2rem); /* 自适应图标大小 */
+            transition: transform 0.3s ease;
+        }
+
+        .info-content .info-item:hover i {
+            transform: rotate(15deg);
+        }
+
+        /* 教育经历板块 */
+        .education-item {
+            margin: clamp(1rem, 3vw, 1.5rem) 0; /* 自适应上下间距 */
+            padding: clamp(1rem, 3vw, 1.5rem); /* 自适应内边距 */
+            border-left: 3px solid var(--light-green);
+            background-color: var(--gray);
+            border-radius: 0 10px 10px 0;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            width: 100%; /* 确保充满板块宽度 */
+        }
+
+        .education-item:hover {
+            transform: translateX(10px);
+            background-color: #f0f8f5;
+        }
+
+        .education-school {
+            font-size: clamp(1.1rem, 3.5vw, 1.3rem); /* 自适应字体 */
+            font-weight: bold;
+            color: var(--dark-green);
+        }
+
+        .education-school a {
+            color: var(--light-green);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .education-school a:hover {
+            color: var(--dark-green);
+            text-decoration: underline;
+        }
+
+        .education-time {
+            color: #666;
+            font-size: clamp(0.8rem, 2vw, 0.9rem); /* 自适应字体 */
+            margin: 0.5rem 0;
+        }
+
+        .education-major {
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2.5vw, 1rem); /* 自适应字体 */
+        }
+
+        .education-item p {
+            margin-top: 1rem;
+            line-height: 1.6;
+            font-size: clamp(0.85rem, 2vw, 0.95rem); /* 自适应字体 */
+        }
+
+        /* 优化：获奖情况板块（增强动态感+自适应） */
+        .awards-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(clamp(250px, 100%, 300px), 1fr)); /* 自适应列数：移动端1列，电脑端多列 */
+            gap: clamp(1.5rem, 3vw, 2rem); /* 自适应间距 */
+            width: 100%; /* 确保充满板块宽度 */
+        }
+
+        .award-item {
+            background-color: var(--gray);
+            padding: clamp(1rem, 3vw, 1.5rem); /* 自适应内边距 */
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            transform: perspective(1000px) rotateY(0deg);
+            width: 100%; /* 确保充满网格列宽度 */
+        }
+
+        .award-item:hover {
+            transform: perspective(1000px) rotateY(5deg) translateY(-5px);
+            box-shadow: 0 6px 20px rgba(10, 75, 62, 0.15);
+            background-color: #f0f8f5;
+        }
+
+        .award-img {
+            width: 100%; /* 图片充满卡片宽度 */
+            height: clamp(120px, 25vw, 180px); /* 自适应高度 */
+            border-radius: 5px;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            transition: transform 0.5s ease;
+        }
+
+        .award-item:hover .award-img {
+            transform: scale(1.03);
+        }
+
+        .award-title {
+            color: var(--dark-green);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem); /* 自适应字体 */
+        }
+
+        .award-time {
+            color: #666;
+            font-size: clamp(0.8rem, 2vw, 0.9rem); /* 自适应字体 */
+            margin-bottom: 1rem;
+        }
+
+        .award-item p {
+            line-height: 1.6;
+            font-size: clamp(0.85rem, 2vw, 0.95rem); /* 自适应字体 */
+        }
+
+        /* 优化：实习经历板块（增强动态感+自适应） */
+        .internship-item {
+            margin: clamp(1rem, 3vw, 1.5rem) 0; /* 自适应上下间距 */
+            padding: clamp(1rem, 3vw, 1.5rem); /* 自适应内边距 */
+            background-color: var(--gray);
+            border-radius: 10px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            width: 100%; /* 确保充满板块宽度 */
+        }
+
+        .internship-item:hover {
+            transform: translateY(-5px) scale(1.01);
+            background-color: #f0f8f5;
+        }
+
+        .internship-company {
+            font-size: clamp(1.1rem, 3.5vw, 1.3rem); /* 自适应字体 */
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .internship-time {
+            color: #666;
+            font-size: clamp(0.8rem, 2vw, 0.9rem); /* 自适应字体 */
+            margin-bottom: 1rem;
+        }
+
+        .internship-desc {
+            line-height: 1.6;
+            font-size: clamp(0.85rem, 2vw, 0.95rem); /* 自适应字体 */
+        }
+
+        .internship-desc p {
+            margin-top: 0.5rem;
+        }
+
+        /* 优化：联系我/留言板块（增强动态感+自适应） */
+        .contact-form {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%; /* 确保表单充满板块宽度 */
+        }
+
+        .form-group {
+            margin: clamp(1rem, 3vw, 1.5rem) 0; /* 自适应上下间距 */
+            transition: transform 0.3s ease;
+            width: 100%; /* 确保表单组充满表单宽度 */
+        }
+
+        .form-group:hover {
+            transform: translateX(3px);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-green);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            font-size: clamp(0.9rem, 2.5vw, 1rem); /* 自适应字体 */
+        }
+
+        .form-group:hover label {
+            color: var(--light-green);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: clamp(0.8rem, 2vw, 1rem); /* 自适应内边距 */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: clamp(0.9rem, 2vw, 1rem); /* 自适应字体 */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--light-green);
+            box-shadow: 0 0 8px rgba(16, 125, 104, 0.3);
+            transform: scale(1.005);
+        }
+
+        .form-group textarea {
+            height: clamp(150px, 30vw, 200px); /* 自适应高度 */
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background-color: var(--dark-green);
+            color: var(--white);
+            border: none;
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem); /* 自适应内边距 */
+            border-radius: 5px;
+            font-size: clamp(0.9rem, 2.5vw, 1rem); /* 自适应字体 */
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%; /* 移动端按钮充满宽度，电脑端自适应 */
+            max-width: 200px; /* 电脑端按钮最大宽度限制 */
+        }
+
+        .submit-btn:hover {
+            background-color: var(--light-green);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 12px rgba(16, 125, 104, 0.2);
+        }
+
+        /* 页脚样式（自适应） */
+        footer {
+            background-color: var(--dark-green);
+            color: var(--white);
+            text-align: center;
+            padding: clamp(1.5rem, 4vw, 2rem); /* 自适应内边距 */
+            margin-top: clamp(2rem, 5vw, 4rem); /* 自适应上间距 */
+            background: linear-gradient(135deg, var(--light-green) 0%, var(--dark-green) 100%);
+            transition: transform 0.3s ease;
+            width: 100%; /* 确保页脚充满屏幕宽度 */
+        }
+
+        footer:hover {
+            transform: translateY(-2px);
+        }
+
+        footer p {
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem); /* 自适应字体 */
+        }
+
+        /* 返回顶部按钮样式（自适应） */
+        .back-to-top {
+            position: fixed;
+            bottom: clamp(20px, 5vw, 30px);
+            right: clamp(20px, 5vw, 30px);
+            width: clamp(40px, 8vw, 50px); /* 自适应尺寸 */
+            height: clamp(40px, 8vw, 50px);
+            border-radius: 50%;
+            border: none;
+            background-color: var(--dark-green);
+            color: var(--white);
+            font-size: clamp(16px, 3vw, 18px); /* 自适应图标大小 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(10, 75, 62, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            cursor: pointer;
+            z-index: 999;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--light-green);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 6px 15px rgba(10, 75, 62, 0.4);
+        }
+
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 新增：动画关键帧（增强活泼感） */
+        @keyframes avatarFloat {
+            from {
+                transform: translateY(0) scale(1);
+            }
+            to {
+                transform: translateY(-10px) scale(1.05);
+            }
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+                border-right: none;
+            }
+        }
+
+        @keyframes blinkCursor {
+            from, to {
+                border-color: transparent;
+            }
+            50% {
+                border-color: var(--white);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 响应式断点优化：针对手机屏幕（768px以下） */
+        @media (max-width: 768px) {
+            /* 移动端导航菜单切换 */
+            .menu-toggle {
+                display: block; /* 显示菜单按钮 */
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px; /* 导航栏高度下方 */
+                right: 0;
+                flex-direction: column;
+                background-color: var(--white);
+                width: 0; /* 初始隐藏 */
+                height: calc(100vh - 70px);
+                box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+                padding: 2rem 0;
+                gap: 1.5rem;
+                align-items: center;
+                transition: width 0.3s ease;
+                overflow: hidden;
+                z-index: 998;
+            }
+
+            .nav-links.active {
+                width: 200px; /* 展开菜单宽度 */
+            }
+
+            /* 个人信息板块移动端布局 */
+            .personal-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .info-content .info-item {
+                justify-content: center;
+            }
+
+            /* 提交按钮移动端充满宽度 */
+            .submit-btn {
+                max-width: 100%;
+            }
+
+            /* 移除移动端导航跟随效果，避免干扰 */
+            document.addEventListener('mousemove', (e) => {
+                const nav = document.querySelector('nav');
+                nav.style.transform = 'translateX(0) translateY(0)';
+            });
+        }
+
+        /* 小屏手机优化（480px以下） */
+        @media (max-width: 480px) {
+            .nav-links.active {
+                width: 100%; /* 菜单充满屏幕宽度 */
+            }
+
+            .info-content {
+                min-width: 250px; /* 进一步减小最小宽度 */
+            }
+
+            .awards-list {
+                grid-template-columns: 1fr; /* 强制1列布局 */
+            }
+
+            .education-item {
+                border-left: none; /* 移除左侧边框，改为顶部边框 */
+                border-top: 3px solid var(--light-green);
+                border-radius: 10px 10px 0 0;
+            }
+
+            .education-item:hover {
+                transform: translateY(-5px) translateX(0); /* 改为上下浮动 */
+            }
+        }
+    </style>
+    <!-- 引入图标库 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- 欢迎页 -->
+    <div class="welcome-page" id="welcomePage">
+        <img src="https://s41.ax1x.com/2025/12/23/pZGS5dA.jpg" alt="个人头像" class="welcome-avatar">
+        <h1 class="welcome-name">孙琪</h1>
+        <p class="welcome-desc">何时葡萄先熟透，你要静候再静候</p>
+    </div>
+
+    <!-- 导航栏（新增移动端菜单按钮） -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">我的简历</div>
+            <!-- 移动端菜单按钮 -->
+            <div class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#personalInfo"><i class="fas fa-user"></i> 个人信息</a></li>
+                <li><a href="#education"><i class="fas fa-graduation-cap"></i> 教育经历</a></li>
+                <li><a href="#awards"><i class="fas fa-medal"></i> 获奖情况</a></li>
+                <li><a href="#internship"><i class="fas fa-briefcase"></i> 实习经历</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope"></i> 联系我</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容容器 -->
+    <div class="container">
+        <!-- 个人信息板块 -->
+        <section class="section" id="personalInfo">
+            <h2 class="section-title">个人信息</h2>
+            <div class="personal-info">
+                <div class="info-avatar">
+                    <img src="https://s41.ax1x.com/2025/12/23/pZGS5dA.jpg" alt="个人头像">
+                </div>
+                <div class="info-video">
+                    <video class="personal-video" controls muted loop poster="images/video-cover.png">
+                        <source src="WeChat_20251222160250.mp4" type="video/mp4">
+                        您的浏览器不支持HTML5视频播放，请升级浏览器后重试。
+                    </video>
+                    <p class="video-desc">可点击播放/暂停，自动静音循环</p>
+                </div>
+                <div class="info-content">
+                    <h2>孙琪</h2>
+                    <div class="info-item">
+                        <i class="fas fa-id-card"></i>
+                        <span>性别：女</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-birthday-cake"></i>
+                        <span>出生日期：2006年2月</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <span>联系电话：17777777777</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>电子邮箱：sunqi@qq.com</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>现居地址：辽宁省大连市</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-star"></i>
+                        <span>个人特长：Web开发、UI设计、数据分析</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 教育经历板块 -->
+        <section class="section" id="education">
+            <h2 class="section-title">教育经历</h2>
+            <div class="education-list">
+                <div class="education-item">
+                    <div class="education-school">
+                        <a href="https://www.dlou.edu.cn/" target="_blank">大连海洋大学</a>
+                    </div>
+                    <div class="education-time">2024年9月 - 2028年6月</div>
+                    <div class="education-major">本科 | 数据科学与大数据技术</div>
+                    <p style="margin-top: 1rem; line-height: 1.6;">
+                        主修课程：数据结构、计算机网络、Web前端开发、数据库原理、人工智能导论等，
+                        在校期间成绩优异，多次获得校级奖学金，专业排名前10%。
+                    </p>
+                </div>
+                <div class="education-item">
+                    <div class="education-school">大连市第一中学</div>
+                    <div class="education-time">2022年9月 - 2024年6月</div>
+                    <div class="education-major">高中 | 理科重点班</div>
+                    <p style="margin-top: 1rem; line-height: 1.6;">
+                        担任班级学习委员，多次获得"三好学生"称号，高考成绩优异，顺利考入大连海洋大学。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 获奖情况板块 -->
+        <section class="section" id="awards">
+            <h2 class="section-title">获奖情况</h2>
+            <div class="awards-list">
+                <div class="award-item">
+                    <img src="https://s41.ax1x.com/2025/12/23/pZGppiq.jpg" alt="校级奖学金" class="award-img">
+                    <div class="award-title">校级奖学金</div>
+                    <div class="award-time">2025年12月</div>
+                    <p style="line-height: 1.6;">
+                        因学业成绩优异、综合表现突出，获得校级奖学金，全校仅5人获评。
+                    </p>
+                </div>
+                <div class="award-item">
+                    <img src="https://cdn.pixabay.com/photo/2016/03/27/18/54/technology-1283624_1280.jpg" alt="全国大学生Web开发大赛一等奖" class="award-img">
+                    <div class="award-title">全国大学生Web开发大赛一等奖</div>
+                    <div class="award-time">2025年8月</div>
+                    <p style="line-height: 1.6;">
+                        团队开发的"校园服务平台"获得大赛一等奖，得到评委高度评价，具备实际应用价值。
+                    </p>
+                </div>
+                <div class="award-item">
+                    <img src="https://s41.ax1x.com/2025/12/23/pZGSIII.jpg" alt="校级三好学生" class="award-img">
+                    <div class="award-title">校级三好学生</div>
+                    <div class="award-time">2025年12月</div>
+                    <p style="line-height: 1.6;">
+                        因在校表现优异、成绩优秀，因此荣获“三好学生”称号。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 实习经历板块 -->
+        <section class="section" id="internship">
+            <h2 class="section-title">实习经历</h2>
+            <div class="internship-list">
+                <div class="internship-item">
+                    <div class="internship-company">大连科技有限公司</div>
+                    <div class="internship-time">2028年7月 - 2030年9月 | Web前端开发实习生</div>
+                    <div class="internship-desc">
+                        <p>1. 参与公司官网的改版工作，使用HTML、CSS、JavaScript实现页面布局与交互效果，提升官网用户体验；</p>
+                        <p style="margin-top: 0.5rem;">2. 协助资深工程师完成后台管理系统的组件开发，使用Vue框架实现数据可视化模块；</p>
+                        <p style="margin-top: 0.5rem;">3. 优化页面加载速度，将首屏加载时间缩短30%，获得领导认可；</p>
+                        <p style="margin-top: 0.5rem;">4. 参与项目需求评审与测试工作，提交多个bug修复方案，保障项目顺利上线。</p>
+                    </div>
+                </div>
+                <div class="internship-item">
+                    <div class="internship-company">XX互联网工作室</div>
+                    <div class="internship-time">2028年1月 - 2030年2月 | UI/UX设计实习生</div>
+                    <div class="internship-desc">
+                        <p>1. 负责工作室小程序的界面设计，使用Figma完成高保真原型图制作，输出设计规范文档；</p>
+                        <p style="margin-top: 0.5rem;">2. 参与用户调研工作，整理用户反馈并优化界面交互逻辑，提升小程序用户留存率；</p>
+                        <p style="margin-top: 0.5rem;">3. 协助完成宣传海报与推文配图设计，提升工作室品牌形象传播效果。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系我/留言板块 -->
+        <section class="section" id="contact">
+            <h2 class="section-title">联系我</h2>
+            <div class="contact-form">
+                <form id="messageForm">
+                    <div class="form-group">
+                        <label for="name">您的姓名</label>
+                        <input type="text" id="name" required placeholder="请输入您的姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">您的邮箱</label>
+                        <input type="email" id="email" required placeholder="请输入您的电子邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">留言主题</label>
+                        <input type="text" id="subject" required placeholder="请输入留言主题">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">留言内容</label>
+                        <textarea id="message" required placeholder="请输入您想对我说的话..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> 提交留言</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>&copy; 2025 我的个人简历 | 设计与开发：孙琪</p>
+        <p style="margin-top: 0.5rem;">感谢您的浏览</p>
+    </footer>
+
+    <script>
+        // 返回顶部功能实现
+        const backToTopBtn = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('active');
+            } else {
+                backToTopBtn.classList.remove('active');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 1. 首页3秒后跳转
+        setTimeout(() => {
+            const welcomePage = document.getElementById('welcomePage');
+            welcomePage.style.opacity = 0;
+            welcomePage.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                welcomePage.style.display = 'none';
+            }, 1000);
+        }, 3000);
+
+        // 2. 板块滚动可见性动画
+        const sections = document.querySelectorAll('.section');
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    sectionObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+
+        // 3. 留言表单提交处理
+        const messageForm = document.getElementById('messageForm');
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            if (name && email && subject && message) {
+                alert(`感谢${name}的留言！我会尽快通过${email}与您取得联系。`);
+                messageForm.reset();
+            } else {
+                alert('请填写完整的留言信息！');
+            }
+        });
+
+        // 4. 导航栏平滑滚动
+        document.querySelectorAll('.nav-links a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                // 移动端关闭菜单
+                navLinks.classList.remove('active');
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                // 平滑滚动
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 5. 移动端导航菜单切换功能
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            // 切换菜单图标（汉堡/关闭）
+            if (navLinks.classList.contains('active')) {
+                menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+            } else {
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+
+        // 6. 点击页面空白处关闭移动端菜单
+        document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navLinks.classList.remove('active');
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+
+        // 7. 导航栏轻微跟随（仅电脑端生效）
+        function isDesktop() {
+            return window.innerWidth > 768;
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDesktop()) {
+                const nav = document.querySelector('nav');
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                nav.style.transform = `translateX(${x * -5}px) translateY(${y * -3}px)`;
+            } else {
+                const nav = document.querySelector('nav');
+                nav.style.transform = 'translateX(0) translateY(0)';
+            }
+        });
+
+        // 8. 窗口大小变化时重置布局
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+    </script>
+</body>
+</html>
